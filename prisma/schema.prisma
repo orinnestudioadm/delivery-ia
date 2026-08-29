@@ -1,0 +1,23 @@
+// Prisma schema for DeliveryIA
+// Docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+// Mirrors the authenticated user from Clerk so the rest of the schema
+// can reference a local id instead of the Clerk user id directly.
+model User {
+  id        String   @id @default(cuid())
+  clerkId   String   @unique
+  email     String   @unique
+  name      String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}

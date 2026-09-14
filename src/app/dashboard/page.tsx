@@ -2,13 +2,15 @@ import Link from "next/link";
 import { auth, currentUser } from "@clerk/nextjs/server";
 import { listOrdersForUser } from "@/lib/orders";
 import { ORDER_STATUS_LABELS, type OrderStatus } from "@/lib/order-status";
+import { getRecommendedStores } from "@/lib/recommendations";
 import { formatCurrency } from "@/lib/format";
-import { ShoppingBag, ArrowRight } from "lucide-react";
+import { ShoppingBag, ArrowRight, Sparkles } from "lucide-react";
 
 export default async function DashboardPage() {
   await auth.protect();
   const user = await currentUser();
   const orders = user ? await listOrdersForUser(user.id) : [];
+  const recommendedStores = user ? await getRecommendedStores(user.id) : [];
 
   return (
     <div className="mx-auto max-w-3xl px-6 py-16">
@@ -95,6 +97,31 @@ export default async function DashboardPage() {
           </div>
         )}
       </section>
+
+      {recommendedStores.length > 0 && (
+        <section className="mt-10">
+          <h2 className="text-lg font-semibold flex items-center gap-2">
+            <Sparkles className="size-5" aria-hidden />
+            Recomendado para você
+          </h2>
+
+          <div className="mt-4 grid gap-3 sm:grid-cols-2">
+            {recommendedStores.slice(0, 4).map((store) => (
+              <Link
+                key={store.id}
+                href={`/stores/${store.id}`}
+                className="flex items-center justify-between rounded-xl border border-black/10 px-4 py-3 text-sm hover:bg-black/5 dark:border-white/10 dark:hover:bg-white/10"
+              >
+                <span>
+                  <span className="font-medium">{store.name}</span>{" "}
+                  <span className="text-foreground/60">· {store.category}</span>
+                </span>
+                <span className="text-foreground/60">★ {store.rating.toFixed(1)}</span>
+              </Link>
+            ))}
+          </div>
+        </section>
+      )}
     </div>
   );
 }

@@ -1,7 +1,9 @@
+# acompanhamento Specification
+
 ## Purpose
 Permite que o cliente consulte o status atual do seu pedido e acompanhe a evolução das etapas (Recebido, Em Preparo, A Caminho, Entregue), com garantia de controle de acesso restrito ao proprietário do pedido.
 
-## ADDED Requirements
+## Requirements
 
 ### Requirement: Consulta de Status do Pedido pelo Dono
 O sistema SHALL exibir os detalhes e o status atual do pedido para o cliente autenticado que realizou a compra.

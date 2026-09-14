@@ -1,19 +1,100 @@
+import Link from "next/link";
 import { auth, currentUser } from "@clerk/nextjs/server";
+import { listOrdersForUser } from "@/lib/orders";
+import { ORDER_STATUS_LABELS, type OrderStatus } from "@/lib/order-status";
+import { formatCurrency } from "@/lib/format";
+import { ShoppingBag, ArrowRight } from "lucide-react";
 
 export default async function DashboardPage() {
   await auth.protect();
   const user = await currentUser();
+  const orders = user ? await listOrdersForUser(user.id) : [];
 
   return (
-    <div className="mx-auto max-w-2xl px-6 py-16">
-      <h1 className="text-2xl font-semibold">Dashboard</h1>
-      <p className="mt-2 text-foreground/70">
-        Rota protegida por verificação de autenticação no próprio Server
-        Component — só é acessível com sessão autenticada.
-      </p>
-      <p className="mt-6 rounded-lg border border-black/10 px-4 py-3 text-sm dark:border-white/10">
-        Olá, {user?.firstName ?? user?.emailAddresses[0]?.emailAddress ?? "usuário"}.
-      </p>
+    <div className="mx-auto max-w-3xl px-6 py-16">
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl font-bold">Dashboard</h1>
+          <p className="mt-1 text-sm text-foreground/70">
+            Olá, {user?.firstName ?? user?.emailAddresses[0]?.emailAddress ?? "usuário"}.
+          </p>
+        </div>
+        <Link
+          href="/stores"
+          className="inline-flex items-center gap-2 rounded-full bg-foreground px-5 py-2 text-sm font-medium text-background hover:opacity-90"
+        >
+          Ver Lojas
+        </Link>
+      </div>
+
+      <section className="mt-10">
+        <h2 className="text-lg font-semibold flex items-center gap-2">
+          <ShoppingBag className="size-5" aria-hidden />
+          Meus Pedidos
+        </h2>
+
+        {orders.length === 0 ? (
+          <div className="mt-4 rounded-xl border border-black/10 p-6 text-center dark:border-white/10">
+            <p className="text-sm text-foreground/70">
+              Você ainda não realizou nenhum pedido.
+            </p>
+            <Link
+              href="/stores"
+              className="mt-4 inline-block text-sm font-medium text-foreground underline hover:opacity-80"
+            >
+              Explorar restaurantes e lojas
+            </Link>
+          </div>
+        ) : (
+          <div className="mt-4 divide-y divide-black/5 rounded-xl border border-black/10 bg-white dark:divide-white/5 dark:border-white/10 dark:bg-zinc-950">
+            {orders.map((order) => (
+              <div
+                key={order.id}
+                className="flex flex-col gap-3 p-4 sm:flex-row sm:items-center sm:justify-between"
+              >
+                <div>
+                  <div className="flex items-center gap-2">
+                    <span className="font-semibold">{order.storeName}</span>
+                    <span className="text-xs text-foreground/50 font-mono">
+                      #{order.id.slice(-6)}
+                    </span>
+                  </div>
+                  <p className="mt-0.5 text-xs text-foreground/60">
+                    {order.itemCount} {order.itemCount === 1 ? "item" : "itens"} ·{" "}
+                    {formatCurrency(order.totalInCents)} ·{" "}
+                    {new Date(order.createdAt).toLocaleDateString("pt-BR", {
+                      day: "2-digit",
+                      month: "short",
+                      hour: "2-digit",
+                      minute: "2-digit",
+                    })}
+                  </p>
+                </div>
+                <div className="flex items-center justify-between gap-4 sm:justify-end">
+                  <span
+                    className={`rounded-full px-2.5 py-0.5 text-xs font-medium ${
+                      order.status === "DELIVERED"
+                        ? "bg-green-500/10 text-green-600 dark:text-green-400"
+                        : order.status === "CANCELED"
+                        ? "bg-red-500/10 text-red-600 dark:text-red-400"
+                        : "bg-blue-500/10 text-blue-600 dark:text-blue-400"
+                    }`}
+                  >
+                    {ORDER_STATUS_LABELS[order.status as OrderStatus]}
+                  </span>
+                  <Link
+                    href={`/orders/${order.id}`}
+                    className="inline-flex items-center gap-1 text-xs font-medium hover:underline"
+                  >
+                    Acompanhar
+                    <ArrowRight className="size-3" aria-hidden />
+                  </Link>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </section>
     </div>
   );
 }

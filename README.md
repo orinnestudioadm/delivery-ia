@@ -21,7 +21,7 @@ Projeto estruturado com base no **Fluxo de Delivery (Spec-Driven Development)**,
 
 Este repositório implementa um ciclo ágil e controlado de desenvolvimento orientado a especificações (Spec-Driven Development), garantindo governança com agentes de IA, cobertura de testes e entrega contínua.
 
-> **Status atual:** este repositório contém o esqueleto técnico da stack (Next.js + Clerk + Prisma + Playwright) funcionando de ponta a ponta. Os documentos em `docs/problem.md`, `docs/prd.md` e `docs/spec.md` ainda são templates a preencher — as próximas funcionalidades de negócio devem ser guiadas por eles antes de serem implementadas.
+> **Status atual:** este repositório contém o esqueleto técnico da stack (Next.js + Clerk + Prisma + Playwright) funcionando de ponta a ponta, e a definição de produto (marketplace de delivery com recomendações via IA) já está documentada em `docs/problem.md`, `docs/prd.md` e `docs/spec.md`. O roadmap incremental de mudanças vive em `openspec/roadmap.md`, com a Iteração 1 (catálogo de lojas e produtos) implementada e testada.
 
 Consulte a pasta [docs/](./docs) para os documentos de descoberta e produto:
 - [Definição do Problema](./docs/problem.md)

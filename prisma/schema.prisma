@@ -20,4 +20,70 @@ model User {
   name      String?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  stores    Store[]
+  orders    Order[]
+}
+
+// ownerId is modeled now (ahead of the store-owner panel change) to avoid
+// a second migration on this field once RBAC lands.
+model Store {
+  id        String    @id @default(cuid())
+  name      String
+  category  String
+  rating    Float      @default(0)
+  isActive  Boolean    @default(true)
+  ownerId   String
+  owner     User       @relation(fields: [ownerId], references: [id])
+  products  Product[]
+  orders    Order[]
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+}
+
+// priceInCents avoids floating point rounding issues; format for display
+// with formatCurrency (src/lib/format.ts).
+model Product {
+  id            String   @id @default(cuid())
+  name          String
+  description   String
+  priceInCents  Int
+  isActive      Boolean  @default(true)
+  storeId       String
+  store         Store    @relation(fields: [storeId], references: [id], onDelete: Cascade)
+  orderItems    OrderItem[]
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+enum OrderStatus {
+  RECEIVED
+  PREPARING
+  ON_THE_WAY
+  DELIVERED
+  CANCELED
+}
+
+// unitPriceInCents is a snapshot of Product.priceInCents at order time, so
+// historical orders stay accurate even if the product price changes later.
+model Order {
+  id           String      @id @default(cuid())
+  userId       String
+  user         User        @relation(fields: [userId], references: [id])
+  storeId      String
+  store        Store       @relation(fields: [storeId], references: [id])
+  items        OrderItem[]
+  totalInCents Int
+  status       OrderStatus @default(RECEIVED)
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @default(now()) @updatedAt
+}
+
+model OrderItem {
+  id               String  @id @default(cuid())
+  orderId          String
+  order            Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  productId        String
+  product          Product @relation(fields: [productId], references: [id])
+  quantity         Int
+  unitPriceInCents Int
 }

@@ -4,7 +4,8 @@ Roadmap incremental derivado de `docs/prd.md` e `docs/spec.md`, seguindo o ciclo
 
 ## Iterações
 
-1. **`catalogo-lojas-produtos`** — status: **implementado e arquivado**. Listagem de lojas e cardápio (RF01, UC01, UC02).
+0. **`estrutura-inicial`** — status: **implementado e arquivado** (documentação retroativa do bootstrap técnico: Next.js, Clerk, Prisma/Supabase, Vitest/Playwright — commit `8088f2e`, anterior à inicialização do OpenSpec neste repositório).
+1. **`catalogo-lojas-produtos`** — status: **implementado e arquivado**. Listagem de lojas e cardápio (RF01, UC01, UC02). Depende de (0).
 2. **`carrinho-checkout`** — status: **implementado e arquivado**. Carrinho e finalização de pedido (RF04, UC03, UC04). Depende de (1).
 3. **`acompanhamento-pedido`** — status: **implementado e arquivado**. Status do pedido (RF05, UC05). Depende de (2).
 4. **`recomendacao-ia`** — status: **implementado e arquivado**. Recomendação por histórico (RF06, UC06). Depende de (1) e (2).

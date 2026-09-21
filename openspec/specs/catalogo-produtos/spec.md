@@ -15,3 +15,10 @@ O sistema SHALL exibir, para um cliente autenticado, os produtos ativos de uma l
 #### Scenario: Loja inexistente ou inativa
 - **WHEN** o cliente autenticado tenta abrir uma loja que não existe ou está inativa
 - **THEN** o sistema retorna um erro 404
+
+### Requirement: Produtos removidos não aparecem no cardápio
+O sistema SHALL ocultar do cardápio exibido ao cliente os produtos desativados pelo lojista.
+
+#### Scenario: Produto removido pelo lojista
+- **WHEN** o lojista remove um produto e um cliente abre o cardápio da loja
+- **THEN** o cardápio não exibe o produto removido

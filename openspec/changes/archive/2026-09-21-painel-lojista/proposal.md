@@ -28,7 +28,7 @@ Até aqui a plataforma só atende a persona Cliente. A persona Lojista Parceiro 
 ## Dependências
 
 - Requer `catalogo-lojas-produtos` arquivado.
-- Requer definição de como o papel `STORE_OWNER` é atribuído no Clerk (metadata de usuário) — a ser confirmado com o time de produto antes da implementação.
+- O papel `STORE_OWNER` é atribuído via `publicMetadata.role` no Clerk — decisão registrada em `design.md`.
 
 ## Riscos
 

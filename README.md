@@ -28,7 +28,7 @@ Estado do roadmap ([openspec/roadmap.md](./openspec/roadmap.md)):
 | 2 | `carrinho-checkout` — carrinho e pedido | arquivada |
 | 3 | `acompanhamento-pedido` — status do pedido | arquivada |
 | 4 | `recomendacao-ia` — recomendação por histórico | arquivada |
-| 5 | `painel-lojista` — CRUD de cardápio + RBAC | rascunho (`proposal.md`) |
+| 5 | `painel-lojista` — CRUD de cardápio + RBAC | arquivada |
 
 ## Stack tecnológica
 
@@ -118,6 +118,8 @@ E2E_CLERK_USER_PASSWORD=senha-do-usuario-de-teste
 Sem essas credenciais os testes E2E são **ignorados (skipped)**, não executados. O plano de testes do login está em [specs/login-flow-test-plan.md](./specs/login-flow-test-plan.md) e a suíte correspondente em `tests/e2e/login-flow.spec.ts`. Os agentes `playwright-test-planner`, `-generator` e `-healer` estão em `.claude/agents/` (MCP em `.mcp.json`).
 
 Os testes de integração mockam o Prisma; ainda não há teste contra um banco real.
+
+**Painel do lojista.** `/store-admin` só abre para usuários com `publicMetadata.role = "STORE_OWNER"` no Clerk e uma `Store` associada (`Store.ownerId`). Não há tela para atribuir o papel ou criar a loja: configure-os manualmente (passos em [openspec/roadmap.md](./openspec/roadmap.md)).
 
 ## Fluxo de mudanças (OpenSpec)
 

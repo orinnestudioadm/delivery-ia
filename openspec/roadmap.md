@@ -9,7 +9,7 @@ Roadmap incremental derivado de `docs/prd.md` e `docs/spec.md`, seguindo o ciclo
 2. **`carrinho-checkout`** — status: **implementado e arquivado**. Carrinho e finalização de pedido (RF04, UC03, UC04). Depende de (1).
 3. **`acompanhamento-pedido`** — status: **implementado e arquivado**. Status do pedido (RF05, UC05). Depende de (2).
 4. **`recomendacao-ia`** — status: **implementado e arquivado**. Recomendação por histórico (RF06, UC06). Depende de (1) e (2).
-5. **`painel-lojista`** — status: draft. CRUD de cardápio + RBAC (RF07, RNF02, UC07). Depende de (1).
+5. **`painel-lojista`** — status: **implementado e arquivado**. CRUD de cardápio + RBAC (RF07, RNF02, UC07). Depende de (1). Papel `STORE_OWNER` via `publicMetadata.role` do Clerk; remoção de produto é *soft delete*.
 
 Cada `proposal.md` em `openspec/changes/<mudança>/` detalha escopo funcional, dependências, riscos e testes (unitários/integração/E2E) necessários, conforme exigido pelo roteiro — nenhuma mudança é considerada concluída sem os testes correspondentes.
 
@@ -26,6 +26,7 @@ Itens do roteiro "Fluxo de Delivery" que dependem de ações do usuário fora de
 
 - **Credenciais em `.env`**: preencher `CONTEXT7_API_KEY`, `STITCH_API_KEY`, `VERCEL_API_TOKEN`, `SUPABASE_ACCESS_TOKEN`, `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `DATABASE_URL`, `DIRECT_URL`, `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY`, `CLERK_SECRET_KEY`, `CLERK_JWT_KEY` (ver `.env.example` para onde obter cada valor).
 - **Testes E2E (Playwright + Clerk)**: infraestrutura pronta (`@clerk/testing`, `tests/e2e/global.setup.ts`, `tests/e2e/support/auth.ts`, plano `specs/login-flow-test-plan.md`, suíte `tests/e2e/login-flow.spec.ts`, agentes em `.claude/agents/`, workflow `.github/workflows/playwright.yml`). **Nenhum teste E2E foi executado até hoje** — sem as chaves do Clerk a suíte inteira fica *skipped*. Para ativar: criar um usuário de teste (senha, sem MFA) na instância de desenvolvimento do Clerk, preencher `E2E_CLERK_USER_USERNAME`/`E2E_CLERK_USER_PASSWORD` no `.env` (e como secrets do repositório para o CI), rodar `npx playwright install` e `npx playwright test`; depois rodar o agente `playwright-test-healer` nas falhas e aposentar os `test.skip` fixos de `stores`, `checkout`, `order-tracking` e `recommendations` (esses ainda precisam de dados de seed no banco).
+- **Configurar o primeiro lojista (`painel-lojista`)**: no dashboard do Clerk, definir `publicMetadata` = `{ "role": "STORE_OWNER" }` no usuário lojista; após ele abrir `/store-admin` uma vez (cria o `User` local), vincular uma linha em `Store` com `ownerId` igual ao id desse `User`. Rodar `npx prisma db push` para aplicar o enum `UserRole` e a coluna `User.role`. Para o E2E do painel, preencher também `E2E_CLERK_OWNER_USERNAME`/`E2E_CLERK_OWNER_PASSWORD`.
 - **MCP Servers (Stitch, Context7)**: configuração em `mcp_config.json` ou UI do Antigravity (preencher com as respectivas API keys quando disponíveis).
 - **Protótipos no Stitch**: exploração de telas via projeto Stitch — depende de login na conta Google/Stitch do usuário.
 - **SonarQube**: arquivos `docker-compose.yml` e `sonar-project.properties` já criados no repositório. Para executar: rodar `docker compose up -d sonarqube`, acessar `http://localhost:9000`, criar o projeto `deliveryia` e disparar o scanner com o token gerado.

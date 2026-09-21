@@ -3,6 +3,7 @@ import { auth, currentUser } from "@clerk/nextjs/server";
 import { listOrdersForUser } from "@/lib/orders";
 import { ORDER_STATUS_LABELS, type OrderStatus } from "@/lib/order-status";
 import { getRecommendedStores } from "@/lib/recommendations";
+import { isStoreOwner, parseRole } from "@/lib/roles";
 import { formatCurrency } from "@/lib/format";
 import { ShoppingBag, ArrowRight, Sparkles } from "lucide-react";
 
@@ -11,6 +12,7 @@ export default async function DashboardPage() {
   const user = await currentUser();
   const orders = user ? await listOrdersForUser(user.id) : [];
   const recommendedStores = user ? await getRecommendedStores(user.id) : [];
+  const isOwner = user ? isStoreOwner(parseRole(user.publicMetadata)) : false;
 
   return (
     <div className="mx-auto max-w-3xl px-6 py-16">
@@ -21,12 +23,22 @@ export default async function DashboardPage() {
             Olá, {user?.firstName ?? user?.emailAddresses[0]?.emailAddress ?? "usuário"}.
           </p>
         </div>
-        <Link
-          href="/stores"
-          className="inline-flex items-center gap-2 rounded-full bg-foreground px-5 py-2 text-sm font-medium text-background hover:opacity-90"
-        >
-          Ver Lojas
-        </Link>
+        <div className="flex items-center gap-3">
+          {isOwner && (
+            <Link
+              href="/store-admin"
+              className="inline-flex items-center gap-2 rounded-full border border-black/15 px-5 py-2 text-sm font-medium hover:bg-black/5 dark:border-white/15 dark:hover:bg-white/10"
+            >
+              Painel do lojista
+            </Link>
+          )}
+          <Link
+            href="/stores"
+            className="inline-flex items-center gap-2 rounded-full bg-foreground px-5 py-2 text-sm font-medium text-background hover:opacity-90"
+          >
+            Ver Lojas
+          </Link>
+        </div>
       </div>
 
       <section className="mt-10">

@@ -11,13 +11,21 @@ datasource db {
   directUrl = env("DIRECT_URL")
 }
 
+enum UserRole {
+  CUSTOMER
+  STORE_OWNER
+}
+
 // Mirrors the authenticated user from Clerk so the rest of the schema
 // can reference a local id instead of the Clerk user id directly.
+// role is a mirror of Clerk publicMetadata.role, refreshed on upsert; the
+// authorization decision itself always reads the role from Clerk.
 model User {
   id        String   @id @default(cuid())
   clerkId   String   @unique
   email     String   @unique
   name      String?
+  role      UserRole @default(CUSTOMER)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   stores    Store[]

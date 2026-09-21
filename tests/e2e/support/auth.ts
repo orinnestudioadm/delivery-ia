@@ -24,16 +24,17 @@ export function hasTestUser(): boolean {
   );
 }
 
-// Signs in the dedicated E2E user through Clerk's testing helper.
+// Signs in a user through Clerk's testing helper (password strategy, no MFA).
 // clerk.signIn requires an unprotected page that loads Clerk to be open first.
-export async function signInAsTestUser(page: Page): Promise<void> {
+export async function signInAs(page: Page, identifier: string, password: string): Promise<void> {
   await page.goto("/");
   await clerk.signIn({
     page,
-    signInParams: {
-      strategy: "password",
-      identifier: process.env.E2E_CLERK_USER_USERNAME!,
-      password: process.env.E2E_CLERK_USER_PASSWORD!,
-    },
+    signInParams: { strategy: "password", identifier, password },
   });
+}
+
+// Signs in the dedicated E2E customer user.
+export async function signInAsTestUser(page: Page): Promise<void> {
+  await signInAs(page, process.env.E2E_CLERK_USER_USERNAME!, process.env.E2E_CLERK_USER_PASSWORD!);
 }

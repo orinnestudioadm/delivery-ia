@@ -5,24 +5,54 @@ context: |
   All artifacts must be written in pt-BR.
   Keep OpenSpec structural headings and SHALL/MUST keywords in English.
 
-# Per-artifact rules (optional)
-# Add custom rules for specific artifacts.
-# Example:
-#   rules:
-#     proposal:
-#       - Keep proposals under 500 words
-#       - Always include a "Non-goals" section
-#     tasks:
-#       - Break tasks into chunks of max 2 hours
+  Projeto: DeliveryIA — marketplace de delivery com recomendações por IA
+  (docs/problem.md, docs/prd.md, docs/spec.md, docs/architecture.md, docs/design.md).
+  Personas: Cliente e Lojista Parceiro. Requisitos: RF01–RF07, RNF01–RNF03.
 
-# Per-operation guidance (optional)
-# Add advisory guidance for how apply and archive work should be conducted.
-# This is separate from artifact rules above.
-# Example:
-#   operations:
-#     apply:
-#       guidance:
-#         - Keep test summaries concise
-#     archive:
-#       guidance:
-#         - Summarize the archive outcome before finishing
+  Stack:
+  - Frontend/Backend: Next.js (App Router, Server Components, Server Actions), React, Tailwind CSS, TypeScript estrito
+  - Autenticação: Clerk (middleware em src/proxy.ts; rotas privadas protegidas com auth.protect())
+  - Dados: Prisma ORM sobre Supabase (PostgreSQL); valores monetários em centavos (Int)
+  - Validação de entrada: Zod
+  - Testes: Vitest (unitário e integração), Playwright (E2E)
+  - Deploy: Vercel
+
+  Convenções:
+  - Preços e totais são sempre recalculados no servidor; nunca confiar em valores enviados pelo cliente.
+  - Camada de dados em src/lib/*.ts (funções puras separadas do acesso ao Prisma quando possível).
+  - Rotas privadas: Server Component com auth.protect().
+  - Design (docs/design.md): mobile-first, Tailwind tokens, dark mode nativo, acessibilidade WCAG 2.1 AA.
+
+  Qualidade (gate de conclusão de qualquer change):
+  - npm run lint sem erros
+  - npm run test (Vitest) passando, com testes unitários e de integração da change
+  - npx prisma validate quando o schema mudar
+  - npm run build passando
+  - Teste E2E Playwright escrito para a jornada da change (tests/e2e/*.spec.ts, plano em specs/*.md)
+  - Nenhuma change é considerada concluída sem os testes correspondentes
+
+rules:
+  proposal:
+    - Referenciar os RF/RNF e casos de uso (UC) de docs/prd.md e docs/spec.md atendidos pela change.
+    - Informar escopo funcional, dependências, riscos, linter e testes (unitários, integração e E2E) necessários.
+    - Nenhuma change pode ter tamanho, complexidade ou risco maior que médio; dividir quando exceder.
+  specs:
+    - Cada requisito deve ter ao menos um cenário WHEN/THEN testável.
+    - Cobrir o fluxo principal e os fluxos de exceção do caso de uso (erros 400/401/403/404).
+  design:
+    - Registrar decisões com justificativa e alternativas descartadas.
+    - Destacar impactos de segurança (Clerk, RBAC) e de schema Prisma.
+  tasks:
+    - Incluir tarefas explícitas de testes (unitário, integração, E2E) e de verificação (lint, test, build).
+    - Quebrar em tarefas de no máximo 2 horas.
+
+operations:
+  apply:
+    guidance:
+      - Ler os docs em docs/ e a change inteira antes de implementar.
+      - Consultar documentação atualizada das bibliotecas (Context7 MCP, quando configurado) antes de usar APIs do Next.js, Clerk, Prisma ou Playwright.
+      - Marcar as tarefas em tasks.md conforme forem concluídas.
+  archive:
+    guidance:
+      - Registrar um VERIFICATION.md na change com os comandos executados e resultados antes de arquivar.
+      - Atualizar o status da change em openspec/roadmap.md.

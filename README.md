@@ -1,103 +1,146 @@
-# 🚀 DeliveryIA Project
+# DeliveryIA
 
-Projeto estruturado com base no **Fluxo de Delivery (Spec-Driven Development)**, utilizando stack moderna com Next.js, Clerk, Supabase, Prisma e automação de testes com Playwright.
+Marketplace de delivery com recomendações por IA, construído com **Spec-Driven Development**: cada funcionalidade nasce como uma *change* do [OpenSpec](https://openspec.dev/), é implementada por agentes de IA, verificada com testes e só então arquivada nas especificações do projeto.
 
----
+## Sumário
 
-## 📑 Sumário
-
-- [Visão Geral](#visão-geral)
-- [Stack Tecnológica](#stack-tecnológica)
-- [Estrutura do Repositório](#estrutura-do-repositório)
+- [Visão geral](#visão-geral)
+- [Stack tecnológica](#stack-tecnológica)
+- [Estrutura do repositório](#estrutura-do-repositório)
 - [Pré-requisitos](#pré-requisitos)
-- [Configuração do Ambiente](#configuração-do-ambiente)
-- [Executando a Aplicação](#executando-a-aplicação)
+- [Configuração do ambiente](#configuração-do-ambiente)
+- [Executando a aplicação](#executando-a-aplicação)
 - [Testes](#testes)
-- [Documentação Completa](#documentação-completa)
+- [Fluxo de mudanças (OpenSpec)](#fluxo-de-mudanças-openspec)
+- [Documentação](#documentação)
+- [Governança do agente de IA](#governança-do-agente-de-ia)
 
----
+## Visão geral
 
-## 🌟 Visão Geral
+O DeliveryIA conecta **clientes** a **lojas parceiras** e usa o histórico de pedidos para recomendar lojas relevantes. A definição do produto está em [docs/](./docs).
 
-Este repositório implementa um ciclo ágil e controlado de desenvolvimento orientado a especificações (Spec-Driven Development), garantindo governança com agentes de IA, cobertura de testes e entrega contínua.
+Estado do roadmap ([openspec/roadmap.md](./openspec/roadmap.md)):
 
-> **Status atual:** este repositório contém o esqueleto técnico da stack (Next.js + Clerk + Prisma + Playwright) funcionando de ponta a ponta, e a definição de produto (marketplace de delivery com recomendações via IA) já está documentada em `docs/problem.md`, `docs/prd.md` e `docs/spec.md`. O roadmap incremental de mudanças vive em `openspec/roadmap.md`, com a Iteração 1 (catálogo de lojas e produtos) implementada e testada.
+| # | Change | Status |
+|---|--------|--------|
+| 0 | `estrutura-inicial` — Next.js, Clerk, Prisma, testes | arquivada |
+| 1 | `catalogo-lojas-produtos` — lojas e cardápio | arquivada |
+| 2 | `carrinho-checkout` — carrinho e pedido | arquivada |
+| 3 | `acompanhamento-pedido` — status do pedido | arquivada |
+| 4 | `recomendacao-ia` — recomendação por histórico | arquivada |
+| 5 | `painel-lojista` — CRUD de cardápio + RBAC | rascunho (`proposal.md`) |
 
-Consulte a pasta [docs/](./docs) para os documentos de descoberta e produto:
-- [Definição do Problema](./docs/problem.md)
-- [PRD (Documento de Requisitos)](./docs/prd.md)
-- [Especificação Técnica](./docs/spec.md)
-- [Arquitetura](./docs/architecture.md)
-- [Design e UX](./docs/design.md)
+## Stack tecnológica
 
----
-
-## 🛠️ Stack Tecnológica
-
-- **Frontend:** Next.js (App Router), React, Tailwind CSS, Lucide Icons
-- **Backend / ORM:** Next.js API / NestJS, Prisma ORM
-- **Banco de Dados:** Supabase (PostgreSQL)
+- **Frontend e backend:** Next.js (App Router, Server Components e Server Actions), React, Tailwind CSS, TypeScript
 - **Autenticação:** Clerk
-- **Testes:** Playwright (E2E), Jest / Vitest (Unitários e Integração)
+- **Banco de dados:** Supabase (PostgreSQL) via Prisma ORM
+- **Validação:** Zod
+- **Testes:** Vitest (unitário e integração), Playwright (E2E)
+- **Especificações:** OpenSpec
 - **Deploy:** Vercel
 
----
+## Estrutura do repositório
 
-## 📂 Estrutura do Repositório
+```text
+.
+├── .agents/skills/        # Skills do agente de IA
+├── .claude/               # Comandos/skills do OpenSpec e agentes do Playwright (Claude Code)
+├── .github/workflows/     # CI: lint, testes e Playwright
+├── docs/                  # problem, prd, spec, architecture, design
+├── openspec/
+│   ├── config.yaml        # Contexto e regras do projeto para o OpenSpec
+│   ├── roadmap.md         # Roadmap de mudanças
+│   ├── changes/           # Changes em andamento e archive/
+│   └── specs/             # Especificações vivas (uma pasta por capability)
+├── prisma/schema.prisma   # Modelos de dados
+├── specs/                 # Planos de teste E2E (Playwright)
+├── src/
+│   ├── app/               # Rotas (App Router)
+│   └── lib/               # Camada de dados e regras de negócio
+├── tests/
+│   ├── unit/              # Vitest — funções puras
+│   ├── integration/       # Vitest — camada de dados (Prisma mockado)
+│   └── e2e/               # Playwright
+├── AGENTS.md              # Regras e governança para agentes de IA
+├── docker-compose.yml     # SonarQube (inspeção de código)
+└── sonar-project.properties
+```
 
-`	ext
-├── .agents/          # Skills e configurações do agente de IA
-├── docs/             # Documentação de arquitetura, PRD, spec e design
-│   ├── architecture.md
-│   ├── design.md
-│   ├── prd.md
-│   ├── problem.md
-│   └── spec.md
-├── src/              # Código-fonte da aplicação (App Router, componentes, lib)
-├── tests/            # Testes automatizados (E2E e unitários)
-├── .env              # Variáveis de ambiente locais
-├── .gitignore        # Arquivos ignorados pelo Git
-├── AGENTS.md         # Regras de governança e comportamento do agente de IA
-└── README.md         # Documentação principal
-`
+## Pré-requisitos
 
----
+- Node.js 22+ e npm
+- Git
+- Docker (opcional, para o SonarQube)
+- Contas: GitHub, Vercel, Supabase e Clerk
 
-## ⚙️ Configuração do Ambiente
+## Configuração do ambiente
 
-1. Configure as variáveis no arquivo \.env\.
-2. Instale as dependências com \
-pm install\.
-3. Sincronize o banco de dados com \
-px prisma db push\.
+1. Copie `.env.example` para `.env` e preencha os valores (cada credencial indica onde obtê-la). O arquivo `.env` está no `.gitignore`.
+2. Instale as dependências:
 
----
+   ```bash
+   npm install
+   ```
 
-## ▶️ Executando a Aplicação
+3. Gere o cliente do Prisma e sincronize o schema com o banco:
 
-`ash
-# Modo desenvolvimento
-npm run dev
+   ```bash
+   npx prisma generate
+   npx prisma db push
+   ```
 
-# Build de produção
-npm run build
-npm run start
-`
+Sem as chaves do Clerk (`NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY`, `CLERK_SECRET_KEY`) a aplicação não inicia; sem `DATABASE_URL`/`DIRECT_URL` o Prisma não valida o schema.
 
----
+## Executando a aplicação
 
-## 🧪 Testes
+```bash
+npm run dev      # desenvolvimento em http://localhost:3000
+npm run build    # build de produção
+npm run start    # servidor de produção
+```
 
-`ash
-# Executar testes unitários
-npm run test
+## Testes
 
-# Executar testes E2E com Playwright
-npx playwright test
-`
+```bash
+npm run lint         # ESLint
+npm run test         # Vitest: unitários + integração
+npx playwright test  # E2E (Playwright)
+```
 
----
+**E2E com Clerk.** O Playwright usa `@clerk/testing` (`tests/e2e/global.setup.ts` e `tests/e2e/support/auth.ts`). Para ativar a suíte, configure no `.env` as chaves do Clerk **e** um usuário de teste criado no dashboard do Clerk (instância de desenvolvimento, login por senha):
 
-## 🤖 Governança do Agente de IA
+```dotenv
+E2E_CLERK_USER_USERNAME=usuario-de-teste@example.com
+E2E_CLERK_USER_PASSWORD=senha-do-usuario-de-teste
+```
 
-As diretrizes de comportamento do agente, comandos seguros e regras de qualidade estão formalizadas em [AGENTS.md](./AGENTS.md).
+Sem essas credenciais os testes E2E são **ignorados (skipped)**, não executados. O plano de testes do login está em [specs/login-flow-test-plan.md](./specs/login-flow-test-plan.md) e a suíte correspondente em `tests/e2e/login-flow.spec.ts`. Os agentes `playwright-test-planner`, `-generator` e `-healer` estão em `.claude/agents/` (MCP em `.mcp.json`).
+
+Os testes de integração mockam o Prisma; ainda não há teste contra um banco real.
+
+## Fluxo de mudanças (OpenSpec)
+
+Cada mudança segue o ciclo **propose → apply → verify → archive**:
+
+```bash
+openspec view                       # progresso geral
+openspec list --changes             # changes em andamento
+openspec validate <change>          # valida os artefatos
+openspec archive <change> --yes     # arquiva e sincroniza as specs
+```
+
+No Claude Code, use os comandos `/opsx:explore`, `/opsx:propose`, `/opsx:apply` e `/opsx:archive`. Cada change arquivada guarda `proposal.md`, `design.md`, `specs/`, `tasks.md` e um `VERIFICATION.md` com os comandos executados e seus resultados.
+
+## Documentação
+
+- [Definição do problema](./docs/problem.md)
+- [PRD — requisitos do produto](./docs/prd.md)
+- [Especificação técnica e casos de uso](./docs/spec.md)
+- [Arquitetura](./docs/architecture.md)
+- [Design e UX](./docs/design.md)
+- [Roadmap de mudanças](./openspec/roadmap.md)
+
+## Governança do agente de IA
+
+Comportamento, comandos seguros e regras de qualidade para agentes estão em [AGENTS.md](./AGENTS.md).

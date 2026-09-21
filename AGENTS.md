@@ -7,9 +7,10 @@ Este arquivo define os padrões de comportamento, governança, stack tecnológic
 ## 1. Comportamento e Princípios Gerais
 
 - **Ciclo Planejar/Executar (Research -> Plan -> Implement):**
-  - **Pesquisa (Research):** Ler documentos em \docs/*\, entender o código existente e inspecionar dependências antes de modificar código.
+  - **Pesquisa (Research):** Ler documentos em `docs/*`, entender o código existente e inspecionar dependências antes de modificar código.
   - **Planejamento (Plan):** Propor planos estruturados para alterações arquiteturais ou novos fluxos.
   - **Implementação (Implement):** Executar modificações atômicas, mantendo integridade de testes e padrões de código.
+- **Spec-Driven Development:** Toda funcionalidade nova passa por uma change do OpenSpec (`openspec/changes/`), seguindo propose -> apply -> verify -> archive. Regras e contexto do projeto estão em `openspec/config.yaml`.
 - **Context7 MCP:** Sempre que houver dúvidas sobre versões recentes de bibliotecas ou APIs (Next.js, Clerk, Supabase, Prisma, Playwright), consulte o Context7 MCP para obter documentação atualizada.
 - **Integridade de Documentação:** Preserve comentários e documentações existentes não relacionados às mudanças solicitadas.
 
@@ -18,85 +19,88 @@ Este arquivo define os padrões de comportamento, governança, stack tecnológic
 ## 2. Stack Tecnológica
 
 - **Frontend:** Next.js (App Router), React, Tailwind CSS, TypeScript.
-- **Autenticação:** Clerk (\@clerk/nextjs\).
-- **Banco de Dados & ORM:** Supabase (PostgreSQL), Prisma ORM (\@prisma/client\).
-- **Testes:** Playwright (E2E), Jest / Vitest (Unit / Integration).
+- **Autenticação:** Clerk (`@clerk/nextjs`).
+- **Banco de Dados & ORM:** Supabase (PostgreSQL), Prisma ORM (`@prisma/client`).
+- **Validação:** Zod.
+- **Testes:** Playwright (E2E), Vitest (Unit / Integration).
 - **Infra & Deploy:** Vercel, Docker.
 
 ---
 
-## 3. Governança e Autonomia no Terminal
+## 3. Estrutura do Repositório
+
+- `docs/` — problem, prd, spec, architecture, design.
+- `openspec/` — `config.yaml`, `roadmap.md`, `changes/` (e `archive/`), `specs/`.
+- `src/app/` — rotas (App Router); `src/lib/` — camada de dados e regras de negócio.
+- `prisma/schema.prisma` — modelos de dados.
+- `tests/unit`, `tests/integration` (Vitest) e `tests/e2e` (Playwright); planos de teste E2E em `specs/`.
+- `.agents/skills/` — skills; `.claude/` — comandos OpenSpec e agentes do Playwright.
+
+---
+
+## 4. Governança e Autonomia no Terminal
 
 ### Ações Autônomas Permitidas
 - Leitura e busca de arquivos no repositório.
 - Criação e edição de arquivos de código, testes e documentação no escopo da tarefa.
-- Execução de comandos de checagem: \
-pm test\, \
-px playwright test\, \
-pm run lint\, \
-px prisma validate\, \
-px prisma generate\.
-- Instalação de dependências acordadas: \
-pm install <pacote>\.
+- Execução de comandos de checagem: `npm test`, `npx playwright test`, `npm run lint`, `npx prisma validate`, `npx prisma generate`, `openspec validate`, `openspec view`.
+- Instalação de dependências acordadas: `npm install <pacote>`.
 
 ### Ações Que Exigem Confirmação do Usuário
-- Execução de migrações destrutivas no banco de dados (\prisma migrate reset\, \DROP TABLE\).
+- `git commit` e `git push` (nunca commitar ou publicar sem pedido explícito).
+- Execução de migrações destrutivas no banco de dados (`prisma migrate reset`, `DROP TABLE`).
 - Exclusão de múltiplos arquivos ou diretórios inteiros.
-- Comandos que alterem branches remotas no Git (\git push --force\).
+- Comandos que alterem branches remotas no Git (`git push --force`).
+- Criação de recursos em serviços externos (contas, projetos, aplicações Clerk/Supabase/Vercel).
 
 ---
 
-## 4. Comandos Principais do Projeto
+## 5. Comandos Principais do Projeto
 
-- **Setup & Dependências:** \
-pm install\
+- **Setup & Dependências:** `npm install`
 - **Banco de Dados:**
-  - Gerar cliente: \
-px prisma generate\
-  - Sincronizar schema (dev): \
-px prisma db push\
-  - Criar migration: \
-px prisma migrate dev --name <nome>\
+  - Gerar cliente: `npx prisma generate`
+  - Sincronizar schema (dev): `npx prisma db push`
+  - Criar migration: `npx prisma migrate dev --name <nome>`
 - **Build & Execução:**
-  - Modo dev: \
-pm run dev\
-  - Build produção: \
-pm run build\
+  - Modo dev: `npm run dev`
+  - Build produção: `npm run build`
 - **Qualidade & Testes:**
-  - Linter: \
-pm run lint\
-  - Testes unitários: \
-pm run test\
-  - Testes E2E: \
-px playwright test\
+  - Linter: `npm run lint`
+  - Testes unitários e de integração: `npm run test`
+  - Testes E2E: `npx playwright test` (exige chaves do Clerk e usuário `E2E_CLERK_USER_*` no `.env`; sem elas os testes são ignorados)
+- **OpenSpec:** `openspec view`, `openspec validate <change>`, `openspec archive <change> --yes`; comandos `/opsx:propose`, `/opsx:apply`, `/opsx:archive`.
 
 ---
 
-## 5. Regras de Qualidade, Testes e Logging
+## 6. Regras de Qualidade, Testes e Logging
 
-- **Testes Obrigatórios:** Toda nova funcionalidade ou correção de bug deve vir acompanhada do respectivo caso de teste (Unitário, Integração ou E2E Playwright).
-- **TypeScript Estrito:** Não utilizar \ny\ implícito. Definir interfaces e tipos claros com validação Zod para I/O.
-- **Logging:** Usar logs estruturados com níveis apropriados (\debug\, \info\, \warn\, \error\). Nunca logar tokens sensíveis ou chaves de API.
+- **Testes Obrigatórios:** Toda nova funcionalidade ou correção de bug deve vir acompanhada do respectivo caso de teste (Unitário, Integração ou E2E Playwright). Nenhuma change é considerada concluída sem os testes correspondentes.
+- **Relato fiel:** Testes ignorados (skipped) ou bloqueados por falta de credenciais devem ser reportados como tal, nunca como aprovados.
+- **TypeScript Estrito:** Não utilizar `any` implícito. Definir interfaces e tipos claros com validação Zod para I/O.
+- **Preços e totais** são sempre recalculados no servidor; nunca confiar em valores enviados pelo cliente.
+- **Logging:** Usar logs estruturados com níveis apropriados (`debug`, `info`, `warn`, `error`). Nunca logar tokens sensíveis ou chaves de API.
 
 ---
 
-## 6. Referências da Documentação
+## 7. Referências da Documentação
 
-Consulte os arquivos na pasta \docs/\ para especificações detalhadas:
+Consulte os arquivos na pasta `docs/` para especificações detalhadas:
 - [docs/problem.md](./docs/problem.md)
 - [docs/prd.md](./docs/prd.md)
 - [docs/spec.md](./docs/spec.md)
 - [docs/architecture.md](./docs/architecture.md)
 - [docs/design.md](./docs/design.md)
+- [openspec/roadmap.md](./openspec/roadmap.md)
 
 ---
 
-## 7. Aprendizado Contínuo e Reflexão
+## 8. Aprendizado Contínuo e Reflexão
 
 Ao final de cada tarefa complexa ou sessão:
 1. Reflita sobre o que foi executado e eventuais atritos ocorridos no fluxo.
-2. Sugira melhorias para este arquivo \AGENTS.md\ ou para os scripts de automação.
-3. Mantenha os documentos em \docs/\ atualizados com o estado real da aplicação.
+2. Sugira melhorias para este arquivo `AGENTS.md` ou para os scripts de automação.
+3. Mantenha os documentos em `docs/` atualizados com o estado real da aplicação.
 
 <!-- BEGIN:nextjs-agent-rules -->
 

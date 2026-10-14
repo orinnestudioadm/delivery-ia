@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import {
   canTransitionOrderStatus,
   formatOrderStatus,
+  getNextOrderStatusOptions,
   getOrderStatusDescription,
   getOrderStatusStep,
 } from "../../src/lib/order-status";
@@ -61,6 +62,36 @@ describe("order-status state machine", () => {
       expect(getOrderStatusStep("ON_THE_WAY")).toBe(2);
       expect(getOrderStatusStep("DELIVERED")).toBe(3);
       expect(getOrderStatusStep("CANCELED")).toBe(-1);
+    });
+  });
+
+  describe("getNextOrderStatusOptions", () => {
+    it("offers the next step and cancellation for an active order", () => {
+      expect(getNextOrderStatusOptions("RECEIVED")).toEqual(["PREPARING", "CANCELED"]);
+      expect(getNextOrderStatusOptions("PREPARING")).toEqual(["ON_THE_WAY", "CANCELED"]);
+      expect(getNextOrderStatusOptions("ON_THE_WAY")).toEqual(["DELIVERED", "CANCELED"]);
+    });
+
+    it("offers no options for a terminal order", () => {
+      expect(getNextOrderStatusOptions("DELIVERED")).toEqual([]);
+      expect(getNextOrderStatusOptions("CANCELED")).toEqual([]);
+    });
+
+    it("agrees with canTransitionOrderStatus for every status pair", () => {
+      const statuses: Array<Parameters<typeof getNextOrderStatusOptions>[0]> = [
+        "RECEIVED",
+        "PREPARING",
+        "ON_THE_WAY",
+        "DELIVERED",
+        "CANCELED",
+      ];
+      for (const current of statuses) {
+        const options = getNextOrderStatusOptions(current);
+        for (const next of statuses) {
+          if (next === current) continue;
+          expect(options.includes(next)).toBe(canTransitionOrderStatus(current, next));
+        }
+      }
     });
   });
 });

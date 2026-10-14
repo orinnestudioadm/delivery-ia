@@ -16,11 +16,12 @@ Backbone (atividades do usuário, eixo horizontal) × releases do roadmap (eixo 
 | **R3 — Status** (`acompanhamento-pedido`) | — | — | — | Ver status do próprio pedido; histórico em "Meus Pedidos" | — | — | — |
 | **R4 — Recomendação** (`recomendacao-ia`) | — | — | — | — | Seção "Recomendado para você" por histórico, com fallback por avaliação | — | — |
 | **R5 — Lojista** (`painel-lojista`) | Papel `STORE_OWNER` via Clerk | — | — | — | — | Criar, editar e remover produto da própria loja | — |
-| **R6 — Pedidos do lojista** (pendente) | — | — | — | — | — | — | Ver pedidos recebidos; atualizar status (hoje só modelado em `order-status.ts`, sem UI para o lojista) |
+| **R5.1 — API REST** (`api-rest-exposure`) | — | — | Checkout via `POST /api/v1/stores/{id}/checkout` | — | — | CRUD via `/api/v1/store-admin/products` | — |
+| **R6 — Pedidos do lojista** (`painel-lojista-pedidos`) | — | — | — | — | — | — | Ver pedidos recebidos; atualizar status via `PATCH /api/v1/store-admin/orders/{id}/status` |
 
 ## Release mínima viável (linha de corte)
 
-A linha de corte do MVP, para efeito de "walking skeleton" citado no slide de IaC, fica entre **R0 e R1**: a partir daí o cliente já consegue completar a Jornada 1 inteira (R0→R4). A Jornada 2 (lojista) só fecha com **R6**, ainda não implementada — é a lacuna já registrada em `docs/jornada-usuario.md`.
+A linha de corte do MVP, para efeito de "walking skeleton" citado no slide de IaC, fica entre **R0 e R1**: a partir daí o cliente já consegue completar a Jornada 1 inteira (R0→R4). A Jornada 2 (lojista) fecha com **R6**: as duas jornadas de negócio do projeto estão completas de ponta a ponta.
 
 ## Rastreabilidade
 

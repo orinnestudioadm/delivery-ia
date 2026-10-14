@@ -204,3 +204,56 @@ export async function listOrdersForUser(clerkUserId: string) {
     createdAt: order.createdAt,
   }));
 }
+
+// storeId comes from an already-resolved store-owner context (see
+// src/app/store-admin/access.ts), so no extra ownership check is needed here.
+export async function listOrdersForStore(storeId: string) {
+  const orders = await prisma.order.findMany({
+    where: { storeId },
+    orderBy: { createdAt: "desc" },
+    include: {
+      user: { select: { name: true, email: true } },
+      items: { select: { quantity: true } },
+    },
+  });
+
+  return orders.map((order) => ({
+    id: order.id,
+    customerName: order.user.name ?? order.user.email,
+    totalInCents: order.totalInCents,
+    status: order.status as OrderStatus,
+    itemCount: order.items.reduce((sum, item) => sum + item.quantity, 0),
+    createdAt: order.createdAt,
+  }));
+}
+
+// Scoped update for the lojista: the order must belong to storeId, or it is
+// treated the same as "not found" (consistent with src/lib/store-admin.ts,
+// which doesn't reveal whether a product exists in another store).
+export async function updateOrderStatusForStore(
+  storeId: string,
+  orderId: string,
+  nextStatus: OrderStatus,
+) {
+  const order = await prisma.order.findFirst({
+    where: { id: orderId, storeId },
+    select: { id: true, status: true },
+  });
+
+  if (!order) {
+    throw new OrderForbiddenError("Você não tem permissão para alterar este pedido.");
+  }
+
+  const currentStatus = order.status as OrderStatus;
+  if (!canTransitionOrderStatus(currentStatus, nextStatus)) {
+    throw new InvalidStatusTransitionError(
+      `Transição de status inválida: de ${currentStatus} para ${nextStatus}.`,
+    );
+  }
+
+  return prisma.order.update({
+    where: { id: orderId },
+    data: { status: nextStatus },
+    select: { id: true, status: true, updatedAt: true },
+  });
+}

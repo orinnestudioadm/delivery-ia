@@ -77,8 +77,19 @@ Esta especificação detalha os casos de uso, fluxos de dados e contratos necess
 - **Fluxo de Exceção**:
   - Tentativa de editar produto de outra loja retorna 403.
 
+### UC08: Acompanhar e atualizar pedidos recebidos (painel do lojista)
+- **Ator**: Lojista autenticado (papel `STORE_OWNER`)
+- **Pré-condições**: Usuário logado com papel de lojista; loja associada ao usuário
+- **Fluxo Principal**:
+  1. O lojista acessa o painel do lojista e vê a lista de pedidos recebidos pela própria loja.
+  2. O lojista avança o status de um pedido (ex.: de "Recebido" para "Em Preparo") ou o cancela.
+  3. O sistema persiste a mudança de status, respeitando a máquina de transições de UC05.
+- **Fluxo de Exceção**:
+  - Transição de status que pula etapas (ex.: "Recebido" direto para "Entregue") retorna 400.
+  - Tentativa de atualizar pedido de outra loja retorna 403.
+
 ## 3.3 Casos de Teste (Playwright / Unitários)
 
-- **E2E (Playwright)**: jornada completa do cliente — login → listar lojas → abrir cardápio → adicionar ao carrinho → checkout → acompanhar status (UC01–UC05); jornada do lojista — login → painel → CRUD de produto (UC07).
-- **Testes de integração**: endpoints/Server Actions de listagem de lojas, cardápio, criação de pedido e recomendação, validando contratos de entrada/saída (Zod) e códigos de status HTTP.
+- **E2E (Playwright)**: jornada completa do cliente — login → listar lojas → abrir cardápio → adicionar ao carrinho → checkout → acompanhar status (UC01–UC05); jornada do lojista — login → painel → CRUD de produto → acompanhar e atualizar pedidos recebidos (UC07, UC08).
+- **Testes de integração**: endpoints de listagem de lojas, cardápio, criação de pedido, recomendação e pedidos do lojista (API REST versionada em `/api/v1`), validando contratos de entrada/saída (Zod) e códigos de status HTTP.
 - **Testes unitários**: funções puras de formatação, cálculo de total do carrinho e regras de recomendação (ex.: ordenação por relevância).

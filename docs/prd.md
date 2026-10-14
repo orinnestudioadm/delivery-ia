@@ -9,7 +9,7 @@ O DeliveryIA é um marketplace de delivery full stack que conecta clientes a loj
 - **Persona 1 — Cliente**: pessoa que faz pedidos de comida/produtos com frequência, busca decidir rapidamente o que pedir e valoriza recomendações relevantes ao invés de navegar por catálogos extensos. Objetivo: encontrar algo bom para pedir em poucos cliques. Desafio: excesso de opções irrelevantes nos apps atuais.
 - **Persona 2 — Lojista Parceiro**: dono ou gestor de um restaurante/comércio local que cadastra seu cardápio na plataforma e depende de recomendações e boa exposição para vender mais, sem orçamento para anúncios. Objetivo: gerenciar seu catálogo e receber pedidos. Desafio: baixa visibilidade em plataformas dominadas por grandes redes.
 - **Jornada principal (Cliente)**: autenticar-se (Clerk) → visualizar lojas recomendadas/buscar lojas → abrir o cardápio de uma loja → adicionar produtos ao carrinho → finalizar o pedido (checkout) → acompanhar o status do pedido → receber recomendações personalizadas para o próximo pedido.
-- **Jornada secundária (Lojista)**: autenticar-se com papel de lojista (RBAC) → acessar painel do lojista → cadastrar/editar produtos do cardápio → visualizar pedidos recebidos.
+- **Jornada secundária (Lojista)**: autenticar-se com papel de lojista (RBAC) → acessar painel do lojista → cadastrar/editar produtos do cardápio → visualizar e atualizar o status dos pedidos recebidos.
 
 ## 2.3 Requisitos Funcionais (RF)
 
@@ -20,6 +20,7 @@ O DeliveryIA é um marketplace de delivery full stack que conecta clientes a loj
 - [RF05] Acompanhamento do status do pedido (recebido → em preparo → a caminho → entregue) pelo cliente.
 - [RF06] Recomendação de produtos e lojas por IA, baseada no histórico de pedidos do cliente autenticado.
 - [RF07] Painel do lojista para cadastro e manutenção do próprio cardápio (CRUD de produtos restrito ao dono da loja).
+- [RF08] Painel do lojista para visualizar os pedidos recebidos pela própria loja e atualizar o status de cada um, respeitando a mesma máquina de transições usada no acompanhamento pelo cliente (RF05).
 
 ## 2.4 Requisitos Não-Funcionais (RNF)
 

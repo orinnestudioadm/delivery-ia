@@ -47,6 +47,12 @@ export function canTransitionOrderStatus(
   return allowed.includes(next);
 }
 
+// Statuses the lojista can move an order to from its current status — used
+// to render the action buttons on the "pedidos recebidos" panel.
+export function getNextOrderStatusOptions(current: OrderStatus): readonly OrderStatus[] {
+  return VALID_TRANSITIONS[current] ?? [];
+}
+
 export function formatOrderStatus(status: OrderStatus): string {
   return ORDER_STATUS_LABELS[status] ?? status;
 }

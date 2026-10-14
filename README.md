@@ -30,8 +30,9 @@ Estado do roadmap ([openspec/roadmap.md](./openspec/roadmap.md)):
 | 4 | `recomendacao-ia` — recomendação por histórico | arquivada |
 | 5 | `painel-lojista` — CRUD de cardápio + RBAC | arquivada |
 | 6 | `api-rest-exposure` — checkout e CRUD do lojista via API REST | arquivada |
+| 7 | `painel-lojista-pedidos` — lojista vê e atualiza status dos pedidos recebidos | arquivada |
 
-**Jornadas de usuário:** duas jornadas ponta a ponta (Cliente e Lojista) estão documentadas em [docs/jornada-usuario.md](./docs/jornada-usuario.md), junto com uma lacuna conhecida — a jornada do lojista ainda não fecha no recebimento do pedido.
+**Jornadas de usuário:** as duas jornadas ponta a ponta exigidas pelo projeto (Cliente e Lojista) estão completas e documentadas em [docs/jornada-usuario.md](./docs/jornada-usuario.md) — a jornada do lojista agora fecha no recebimento e na atualização de status do pedido.
 
 ## Stack tecnológica
 
@@ -148,6 +149,7 @@ As operações de escrita do domínio são expostas em `/api/v1` (Route Handlers
 | `/api/v1/store-admin/products` | `POST` | Cria um produto na loja do lojista autenticado |
 | `/api/v1/store-admin/products/{id}` | `PUT` | Edita um produto da própria loja |
 | `/api/v1/store-admin/products/{id}` | `DELETE` | Remove (soft delete) um produto da própria loja |
+| `/api/v1/store-admin/orders/{id}/status` | `PATCH` | Atualiza o status de um pedido recebido pela própria loja |
 
 As páginas de leitura (lojas, cardápio, dashboard, pedido) continuam renderizadas no servidor chamando a camada de dados diretamente — decisão registrada em `openspec/changes/archive/2026-10-14-api-rest-exposure/design.md`.
 

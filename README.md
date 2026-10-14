@@ -29,10 +29,14 @@ Estado do roadmap ([openspec/roadmap.md](./openspec/roadmap.md)):
 | 3 | `acompanhamento-pedido` — status do pedido | arquivada |
 | 4 | `recomendacao-ia` — recomendação por histórico | arquivada |
 | 5 | `painel-lojista` — CRUD de cardápio + RBAC | arquivada |
+| 6 | `api-rest-exposure` — checkout e CRUD do lojista via API REST | arquivada |
+
+**Jornadas de usuário:** duas jornadas ponta a ponta (Cliente e Lojista) estão documentadas em [docs/jornada-usuario.md](./docs/jornada-usuario.md), junto com uma lacuna conhecida — a jornada do lojista ainda não fecha no recebimento do pedido.
 
 ## Stack tecnológica
 
-- **Frontend e backend:** Next.js (App Router, Server Components e Server Actions), React, Tailwind CSS, TypeScript
+- **Frontend:** Next.js (App Router, Server Components), React, Tailwind CSS, TypeScript
+- **Backend:** API REST versionada (`/api/v1`) via Next.js Route Handlers, para as operações de escrita (checkout, CRUD de produto do lojista)
 - **Autenticação:** Clerk
 - **Banco de dados:** Supabase (PostgreSQL) via Prisma ORM
 - **Validação:** Zod
@@ -134,6 +138,19 @@ openspec archive <change> --yes     # arquiva e sincroniza as specs
 
 No Claude Code, use os comandos `/opsx:explore`, `/opsx:propose`, `/opsx:apply` e `/opsx:archive`. Cada change arquivada guarda `proposal.md`, `design.md`, `specs/`, `tasks.md` e um `VERIFICATION.md` com os comandos executados e seus resultados.
 
+## API REST
+
+As operações de escrita do domínio são expostas em `/api/v1` (Route Handlers), não como Server Actions — ver `openspec/specs/api-rest-exposure/spec.md` para o contrato completo:
+
+| Rota | Verbo | Descrição |
+|---|---|---|
+| `/api/v1/stores/{id}/checkout` | `POST` | Finaliza o pedido a partir do carrinho |
+| `/api/v1/store-admin/products` | `POST` | Cria um produto na loja do lojista autenticado |
+| `/api/v1/store-admin/products/{id}` | `PUT` | Edita um produto da própria loja |
+| `/api/v1/store-admin/products/{id}` | `DELETE` | Remove (soft delete) um produto da própria loja |
+
+As páginas de leitura (lojas, cardápio, dashboard, pedido) continuam renderizadas no servidor chamando a camada de dados diretamente — decisão registrada em `openspec/changes/archive/2026-10-14-api-rest-exposure/design.md`.
+
 ## Documentação
 
 - [Definição do problema](./docs/problem.md)
@@ -141,6 +158,11 @@ No Claude Code, use os comandos `/opsx:explore`, `/opsx:propose`, `/opsx:apply` 
 - [Especificação técnica e casos de uso](./docs/spec.md)
 - [Arquitetura](./docs/architecture.md)
 - [Design e UX](./docs/design.md)
+- [Lean Canvas](./docs/lean-canvas.md)
+- [Personas](./docs/personas.md)
+- [Jornada do usuário](./docs/jornada-usuario.md)
+- [Mapeamento de histórias](./docs/mapeamento-historias.md)
+- [Modelos C4](./docs/c4-models.md)
 - [Roadmap de mudanças](./openspec/roadmap.md)
 
 ## Governança do agente de IA

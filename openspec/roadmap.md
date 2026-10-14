@@ -10,6 +10,9 @@ Roadmap incremental derivado de `docs/prd.md` e `docs/spec.md`, seguindo o ciclo
 3. **`acompanhamento-pedido`** — status: **implementado e arquivado**. Status do pedido (RF05, UC05). Depende de (2).
 4. **`recomendacao-ia`** — status: **implementado e arquivado**. Recomendação por histórico (RF06, UC06). Depende de (1) e (2).
 5. **`painel-lojista`** — status: **implementado e arquivado**. CRUD de cardápio + RBAC (RF07, RNF02, UC07). Depende de (1). Papel `STORE_OWNER` via `publicMetadata.role` do Clerk; remoção de produto é *soft delete*.
+6. **`api-rest-exposure`** — status: **implementado e arquivado**. Checkout e CRUD de produto do lojista expostos como API REST versionada em `/api/v1` (RNF-03), substituindo as Server Actions equivalentes. Depende de (2) e (5).
+
+**Lacuna conhecida (ainda sem change no roadmap):** falta uma `painel-lojista-pedidos` para o lojista ver e atualizar o status dos pedidos recebidos pela própria loja — sem ela, a jornada do lojista não é ponta a ponta (ver `docs/jornada-usuario.md`).
 
 Cada `proposal.md` em `openspec/changes/<mudança>/` detalha escopo funcional, dependências, riscos e testes (unitários/integração/E2E) necessários, conforme exigido pelo roteiro — nenhuma mudança é considerada concluída sem os testes correspondentes.
 

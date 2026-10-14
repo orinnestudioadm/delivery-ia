@@ -91,6 +91,7 @@ Consulte os arquivos na pasta `docs/` para especificações detalhadas:
 - [docs/spec.md](./docs/spec.md)
 - [docs/architecture.md](./docs/architecture.md)
 - [docs/design.md](./docs/design.md)
+- [docs/lean-canvas.md](./docs/lean-canvas.md), [docs/personas.md](./docs/personas.md), [docs/jornada-usuario.md](./docs/jornada-usuario.md), [docs/mapeamento-historias.md](./docs/mapeamento-historias.md), [docs/c4-models.md](./docs/c4-models.md)
 - [openspec/roadmap.md](./openspec/roadmap.md)
 
 ---

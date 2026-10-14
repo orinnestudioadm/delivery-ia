@@ -1,10 +1,12 @@
 "use client";
 
-import { useActionState } from "react";
+import { useActionState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import type { ActionState } from "./types";
 
 type ProductFormProps = {
-  action: (previous: ActionState, formData: FormData) => Promise<ActionState>;
+  mode: "create" | "edit";
+  productId?: string;
   idPrefix: string;
   submitLabel: string;
   defaults?: { name: string; description: string; price: string };
@@ -12,6 +14,46 @@ type ProductFormProps = {
 
 const inputClass =
   "w-full rounded-md border border-black/15 bg-transparent px-3 py-2 text-sm dark:border-white/15";
+
+// Calls the REST endpoint directly (RNF-03) — no Server Action involved.
+// Next.js only lets Server Actions cross the server/client boundary as
+// props, so this function has to live in the client component itself.
+async function submitProduct(
+  mode: "create" | "edit",
+  productId: string | undefined,
+  _previous: ActionState,
+  formData: FormData,
+): Promise<ActionState> {
+  const payload = {
+    name: String(formData.get("name") ?? ""),
+    description: String(formData.get("description") ?? ""),
+    price: String(formData.get("price") ?? ""),
+  };
+  const url = mode === "create" ? "/api/v1/store-admin/products" : `/api/v1/store-admin/products/${productId}`;
+
+  const res = await fetch(url, {
+    method: mode === "create" ? "POST" : "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload),
+  });
+  const body = (await res.json().catch(() => ({}))) as { error?: string };
+
+  if (!res.ok) {
+    return { error: body.error ?? "Não foi possível salvar o produto." };
+  }
+  return { success: mode === "create" ? "Produto criado." : "Produto atualizado." };
+}
+
+// useActionState also passes the previous state, which removal does not need.
+async function submitRemoval(productId: string): Promise<ActionState> {
+  const res = await fetch(`/api/v1/store-admin/products/${productId}`, { method: "DELETE" });
+  const body = (await res.json().catch(() => ({}))) as { error?: string };
+
+  if (!res.ok) {
+    return { error: body.error ?? "Não foi possível remover o produto." };
+  }
+  return { success: "Produto removido." };
+}
 
 function Feedback({ state }: { state: ActionState }) {
   if (state?.error) {
@@ -31,8 +73,18 @@ function Feedback({ state }: { state: ActionState }) {
   return null;
 }
 
-export function ProductForm({ action, idPrefix, submitLabel, defaults }: ProductFormProps) {
+export function ProductForm({ mode, productId, idPrefix, submitLabel, defaults }: ProductFormProps) {
+  const router = useRouter();
+  const action = submitProduct.bind(null, mode, productId);
   const [state, formAction, isPending] = useActionState(action, null);
+
+  // The list rendered by the page is server-fetched; refresh it after a
+  // successful REST mutation so it reflects the new data.
+  useEffect(() => {
+    if (state?.success) {
+      router.refresh();
+    }
+  }, [state, router]);
 
   return (
     <form action={formAction} className="grid gap-3">
@@ -91,13 +143,21 @@ export function ProductForm({ action, idPrefix, submitLabel, defaults }: Product
 }
 
 export function RemoveProductForm({
-  action,
+  productId,
   productName,
 }: {
-  action: (previous: ActionState) => Promise<ActionState>;
+  productId: string;
   productName: string;
 }) {
+  const router = useRouter();
+  const action = submitRemoval.bind(null, productId);
   const [state, formAction, isPending] = useActionState(action, null);
+
+  useEffect(() => {
+    if (state?.success) {
+      router.refresh();
+    }
+  }, [state, router]);
 
   return (
     <form action={formAction} className="flex items-center gap-3">

@@ -2,11 +2,6 @@ import Link from "next/link";
 import { formatCentsForInput } from "@/lib/price";
 import { formatCurrency } from "@/lib/format";
 import { resolveStoreOwnerContext } from "./access";
-import {
-  createProductAction,
-  removeProductAction,
-  updateProductAction,
-} from "./actions";
 import { ProductForm, RemoveProductForm } from "./product-form";
 
 function Notice({ title, children }: { title: string; children: React.ReactNode }) {
@@ -57,7 +52,7 @@ export default async function StoreAdminPage() {
           Novo produto
         </h2>
         <div className="mt-4">
-          <ProductForm action={createProductAction} idPrefix="new" submitLabel="Adicionar produto" />
+          <ProductForm mode="create" idPrefix="new" submitLabel="Adicionar produto" />
         </div>
       </section>
 
@@ -81,7 +76,8 @@ export default async function StoreAdminPage() {
                   Preço atual: {formatCurrency(product.priceInCents)}
                 </p>
                 <ProductForm
-                  action={updateProductAction.bind(null, product.id)}
+                  mode="edit"
+                  productId={product.id}
                   idPrefix={`product-${product.id}`}
                   submitLabel="Salvar alterações"
                   defaults={{
@@ -91,10 +87,7 @@ export default async function StoreAdminPage() {
                   }}
                 />
                 <div className="mt-3 border-t border-black/10 pt-3 dark:border-white/10">
-                  <RemoveProductForm
-                    action={removeProductAction.bind(null, product.id)}
-                    productName={product.name}
-                  />
+                  <RemoveProductForm productId={product.id} productName={product.name} />
                 </div>
               </li>
             ))}

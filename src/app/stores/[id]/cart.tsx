@@ -3,7 +3,6 @@
 import { useMemo, useState, useTransition } from "react";
 import { formatCurrency } from "@/lib/format";
 import { calculateCartTotal } from "@/lib/cart";
-import { checkoutAction } from "./actions";
 
 type Product = {
   id: string;
@@ -41,7 +40,21 @@ export function Cart({ storeId, products }: { storeId: string; products: Product
       .map(([productId, quantity]) => ({ productId, quantity }));
 
     startTransition(async () => {
-      const response = await checkoutAction(storeId, items);
+      // Checkout is a REST endpoint (RNF-03), not a Server Action — the
+      // business logic lives in src/lib/orders.ts either way.
+      const res = await fetch(`/api/v1/stores/${storeId}/checkout`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ items }),
+      });
+      const body = (await res.json().catch(() => ({}))) as {
+        orderId?: string;
+        error?: string;
+      };
+      const response =
+        res.ok && body.orderId
+          ? { orderId: body.orderId }
+          : { error: body.error ?? "Não foi possível finalizar o pedido." };
       setResult(response);
       if ("orderId" in response) {
         setQuantities({});

@@ -27,8 +27,12 @@ test.describe("Fluxo de login com Clerk", () => {
     test("3. header mostra Entrar e esconde Dashboard", async ({ page }) => {
       await page.goto("/");
 
-      await expect(page.getByRole("button", { name: "Entrar" })).toBeVisible();
-      await expect(page.getByRole("link", { name: "Dashboard" })).toHaveCount(0);
+      // Scoped to the header nav: the home page also has an unrelated
+      // "Ir para o dashboard" CTA link that would otherwise match "Dashboard"
+      // (getByRole name matching is a case-insensitive substring by default).
+      const nav = page.getByRole("navigation");
+      await expect(nav.getByRole("button", { name: "Entrar" })).toBeVisible();
+      await expect(nav.getByRole("link", { name: "Dashboard", exact: true })).toHaveCount(0);
     });
   });
 
@@ -50,8 +54,9 @@ test.describe("Fluxo de login com Clerk", () => {
     test("5. header reflete a sessão autenticada", async ({ page }) => {
       await page.goto("/");
 
-      await expect(page.getByRole("link", { name: "Dashboard" })).toBeVisible();
-      await expect(page.getByRole("button", { name: "Entrar" })).toHaveCount(0);
+      const nav = page.getByRole("navigation");
+      await expect(nav.getByRole("link", { name: "Dashboard", exact: true })).toBeVisible();
+      await expect(nav.getByRole("button", { name: "Entrar" })).toHaveCount(0);
     });
 
     test("6. acessa outra rota protegida (/stores)", async ({ page }) => {

@@ -14,7 +14,7 @@ Suíte correspondente: `tests/e2e/store-admin.spec.ts`.
   - **Cliente:** sem `publicMetadata.role`.
 - Credenciais informadas por `E2E_CLERK_OWNER_USERNAME`/`E2E_CLERK_OWNER_PASSWORD` e `E2E_CLERK_USER_USERNAME`/`E2E_CLERK_USER_PASSWORD`.
 - Loja do lojista sem produtos ativos no início de cada execução (ou com nomes de produto únicos por execução).
-- Para os cenários 8 e 9: a loja do lojista com ao menos um pedido em aberto (status "Pedido Recebido"), pertencente ao usuário Cliente acima.
+- Para os cenários 8 e 9: a loja do lojista com ao menos um produto ativo, para o Cliente poder montar um pedido — o cenário finaliza o próprio checkout antes de verificar o painel, em vez de depender de um pedido pré-semeado (a suíte roda contra o banco Supabase real e persistente, não um banco efêmero por execução).
 
 ## Cenários
 
@@ -47,8 +47,8 @@ Suíte correspondente: `tests/e2e/store-admin.spec.ts`.
 **Esperado:** erro de autorização; o produto da outra loja permanece inalterado. (Coberto em profundidade pelo teste de integração `tests/integration/store-admin.test.ts`; no E2E fica como verificação manual assistida.)
 
 ### 8. Ver pedido recebido
-**Passos:** autenticar o lojista e abrir `/store-admin`.
-**Esperado:** seção "Pedidos recebidos" lista o pedido do cliente de teste, com nome do cliente, quantidade de itens, total e status "Pedido Recebido"; botão `Avançar para "Em Preparo"` visível.
+**Passos:** autenticar o cliente, montar e finalizar um pedido na loja do lojista; depois autenticar o lojista e abrir `/store-admin`.
+**Esperado:** seção "Pedidos recebidos" lista o pedido recém-criado, com nome do cliente, quantidade de itens, total e status "Pedido Recebido"; botão `Avançar para "Em Preparo"` visível.
 
 ### 9. Avançar e cancelar o status de um pedido
 **Passos:** no pedido do cenário 8, clicar em `Avançar para "Em Preparo"`; em seguida, clicar em "Cancelar pedido" (ou, em outro pedido em aberto, repetir o avanço até "Entregue").

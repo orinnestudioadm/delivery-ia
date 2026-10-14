@@ -13,6 +13,11 @@ try {
 
 export default defineConfig({
   testDir: "./tests/e2e",
+  testIgnore: /global\.setup\.ts/,
+  // Fetches a Clerk testing token once in the main process, before any
+  // worker is spawned — see tests/e2e/global.setup.ts for why this must be
+  // a real globalSetup and not a "setup project" test.
+  globalSetup: "./tests/e2e/global.setup.ts",
   fullyParallel: true,
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 2 : 0,
@@ -22,12 +27,9 @@ export default defineConfig({
     trace: "on-first-retry",
   },
   projects: [
-    // Fetches a Clerk testing token once, before the browser projects run.
-    { name: "setup", testMatch: /global\.setup\.ts/ },
     {
       name: "chromium",
       use: { ...devices["Desktop Chrome"] },
-      dependencies: ["setup"],
     },
   ],
   // Next.js cannot boot without valid Clerk keys, so only start it when they

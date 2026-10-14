@@ -65,6 +65,8 @@ jobs:
       NEXT_PUBLIC_CLERK_SIGN_UP_URL: /sign-up
       E2E_CLERK_USER_USERNAME: ${{ secrets.E2E_CLERK_USER_USERNAME }}
       E2E_CLERK_USER_PASSWORD: ${{ secrets.E2E_CLERK_USER_PASSWORD }}
+      E2E_CLERK_OWNER_USERNAME: ${{ secrets.E2E_CLERK_OWNER_USERNAME }}
+      E2E_CLERK_OWNER_PASSWORD: ${{ secrets.E2E_CLERK_OWNER_PASSWORD }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4

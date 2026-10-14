@@ -47,7 +47,7 @@ jobs:
       - run: npm run test:coverage
       # Skips instead of failing while the SONAR_TOKEN secret isn't configured yet
       # ("if" cannot read "secrets" directly, so it reads the job-level env mirror above).
-      - uses: SonarSource/sonarqube-scan-action@v4
+      - uses: SonarSource/sonarqube-scan-action@v6
         if: ${{ env.SONAR_TOKEN != '' }}
         env:
           SONAR_HOST_URL: https://sonarcloud.io

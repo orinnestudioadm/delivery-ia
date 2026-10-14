@@ -11,5 +11,11 @@ export default defineConfig({
   },
   test: {
     include: ["tests/unit/**/*.test.ts", "tests/integration/**/*.test.ts"],
+    coverage: {
+      provider: "v8",
+      reporter: ["text", "lcov"],
+      reportsDirectory: "coverage",
+      include: ["src/**/*.ts", "src/**/*.tsx"],
+    },
   },
 });

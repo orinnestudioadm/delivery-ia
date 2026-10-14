@@ -1,10 +1,14 @@
 import { expect, test } from "@playwright/test";
 import { hasClerkKeys, signInAs } from "./support/auth";
 
-// Suite derived from specs/painel-lojista-test-plan.md (scenarios 1-6).
+// Suite derived from specs/painel-lojista-test-plan.md (scenarios 1-6, 8-9).
 // Needs two Clerk users (a customer and a STORE_OWNER with a Store row); it
 // skips — never fails — until both are configured. Scenario 7 (cross-store
-// isolation) is covered by tests/integration/store-admin.test.ts.
+// isolation) is covered by tests/integration/store-admin.test.ts. Scenarios
+// 8-9 (view/advance a received order) additionally need the store to already
+// have an open order (status "Pedido Recebido") placed by the customer user —
+// see tests/integration/orders-store-owner.test.ts for the data-layer coverage
+// that does not depend on that seed data.
 
 const owner = {
   username: process.env.E2E_CLERK_OWNER_USERNAME,
@@ -78,6 +82,23 @@ test.describe("Painel do lojista", () => {
       await newForm.getByRole("button", { name: "Adicionar produto" }).click();
 
       await expect(newForm.getByRole("alert")).toContainText("preço válido");
+    });
+
+    test("8. vê um pedido recebido e 9. avança o status", async ({ page }) => {
+      await page.goto("/store-admin");
+
+      const ordersSection = page.locator("section", { has: page.getByRole("heading", { name: "Pedidos recebidos" }) });
+      const order = ordersSection.getByRole("listitem").first();
+      await expect(order).toBeVisible();
+      await expect(order.getByText("Pedido Recebido")).toBeVisible();
+
+      await order.getByRole("button", { name: 'Avançar para "Em Preparo"' }).click();
+      await expect(page.getByText('Status atualizado para "Em Preparo".')).toBeVisible();
+      await expect(order.getByText("Em Preparo")).toBeVisible();
+
+      await order.getByRole("button", { name: "Cancelar pedido" }).click();
+      await expect(page.getByText('Status atualizado para "Cancelado".')).toBeVisible();
+      await expect(order.getByRole("button")).toHaveCount(0);
     });
   });
 });

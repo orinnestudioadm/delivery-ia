@@ -14,6 +14,7 @@ Suíte correspondente: `tests/e2e/store-admin.spec.ts`.
   - **Cliente:** sem `publicMetadata.role`.
 - Credenciais informadas por `E2E_CLERK_OWNER_USERNAME`/`E2E_CLERK_OWNER_PASSWORD` e `E2E_CLERK_USER_USERNAME`/`E2E_CLERK_USER_PASSWORD`.
 - Loja do lojista sem produtos ativos no início de cada execução (ou com nomes de produto únicos por execução).
+- Para os cenários 8 e 9: a loja do lojista com ao menos um pedido em aberto (status "Pedido Recebido"), pertencente ao usuário Cliente acima.
 
 ## Cenários
 
@@ -45,6 +46,14 @@ Suíte correspondente: `tests/e2e/store-admin.spec.ts`.
 **Passos:** com o lojista autenticado, enviar uma edição para o `id` de um produto de outra loja (Server Action forjada).
 **Esperado:** erro de autorização; o produto da outra loja permanece inalterado. (Coberto em profundidade pelo teste de integração `tests/integration/store-admin.test.ts`; no E2E fica como verificação manual assistida.)
 
+### 8. Ver pedido recebido
+**Passos:** autenticar o lojista e abrir `/store-admin`.
+**Esperado:** seção "Pedidos recebidos" lista o pedido do cliente de teste, com nome do cliente, quantidade de itens, total e status "Pedido Recebido"; botão `Avançar para "Em Preparo"` visível.
+
+### 9. Avançar e cancelar o status de um pedido
+**Passos:** no pedido do cenário 8, clicar em `Avançar para "Em Preparo"`; em seguida, clicar em "Cancelar pedido" (ou, em outro pedido em aberto, repetir o avanço até "Entregue").
+**Esperado:** mensagem "Status atualizado..."; o status exibido muda de acordo; ao chegar em "Entregue" ou "Cancelado" nenhum botão de ação continua visível ("Pedido finalizado").
+
 ## Fora de escopo
 
-- Visualização de pedidos recebidos pelo lojista, criação de lojas e atribuição do papel pela aplicação.
+- Criação de lojas e atribuição do papel pela aplicação (feitas manualmente, ver `openspec/roadmap.md`).

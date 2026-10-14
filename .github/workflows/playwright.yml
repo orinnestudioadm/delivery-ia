@@ -26,6 +26,32 @@ jobs:
       - run: npm run lint
       - run: npm run test
 
+  sonar:
+    name: SonarCloud
+    needs: quality
+    runs-on: ubuntu-latest
+    env:
+      DATABASE_URL: ${{ secrets.DATABASE_URL || 'postgresql://user:pass@localhost:5432/db' }}
+      DIRECT_URL: ${{ secrets.DIRECT_URL || 'postgresql://user:pass@localhost:5432/db' }}
+      SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npx prisma generate
+      - run: npm run test:coverage
+      # Skips instead of failing while the SONAR_TOKEN secret isn't configured yet
+      # ("if" cannot read "secrets" directly, so it reads the job-level env mirror above).
+      - uses: SonarSource/sonarqube-scan-action@v4
+        if: ${{ env.SONAR_TOKEN != '' }}
+        env:
+          SONAR_HOST_URL: https://sonarcloud.io
+
   e2e:
     name: Playwright E2E
     needs: quality
